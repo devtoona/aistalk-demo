@@ -6,6 +6,7 @@ import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
 import { useMicVolumeAnalyzer } from "@/hooks/useMicVolumeAnalyzer";
 import { useVoiceGenerate } from "@/hooks/useVoiceGenerate";
 import { useTTSLoading } from "@/contexts/TTSLoadingContext";
+import { useAuthReady } from "@/contexts/AuthContext";
 import type { Message } from "@/types/Message";
 import type { FetchOpenAIResponse } from "@/types/FetchOpenAIResponse";
 import type { GenerateVoiceData } from "@/types/GenerateVoiceData";
@@ -71,6 +72,7 @@ function ChatPageInner() {
 	const selfAvatar = useMemo(() => getDemoSelfAvatar(), []);
 	const persona = useMemo(() => getDemoPersona(), []);
 	const { ttsLoading, setTTSLoading } = useTTSLoading();
+	const { ready: authReady, error: authError } = useAuthReady();
 	const { sendMessage } = useChatGPT();
 	const [messages, setMessages] = useState<Message[]>([]);
 	const messagesRef = useRef<Message[]>(messages);
@@ -204,8 +206,9 @@ function ChatPageInner() {
 	}, [isRecognizing, startMicVolume, stopMicVolume]);
 
 	useEffect(() => {
-		sessionStart(startRecognition);
-	}, [sessionStart, startRecognition]);
+		if (!authReady) return;
+		void sessionStart(startRecognition);
+	}, [authReady, sessionStart, startRecognition]);
 
 	useEffect(() => {
 		if (!ttsLoading) {
@@ -340,6 +343,11 @@ function ChatPageInner() {
 
 	return (
 		<div className="relative h-screen w-screen overflow-hidden bg-black">
+			{authError ? (
+				<div className="absolute left-0 right-0 top-0 z-[60] bg-red-700/90 px-4 py-2 text-center text-sm text-white">
+					認証に失敗しました: {authError}
+				</div>
+			) : null}
 			<div className="absolute inset-0 z-0">
 				<UnityWebGLFrame
 					className="h-full w-full border-0 bg-black"

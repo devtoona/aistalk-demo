@@ -1,3 +1,4 @@
+import { authFetch } from "@/lib/apiClient";
 import { isSemanticMotionTag } from "@/lib/motionSemanticExpand";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
@@ -47,7 +48,7 @@ export async function inferAvatarMotion(
 		return { lines: [], used_fallback: true };
 	}
 	try {
-		const res = await fetch(`${API_BASE}/api/avatar/motion`, {
+		const res = await authFetch(`${API_BASE}/api/avatar/motion`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(body),

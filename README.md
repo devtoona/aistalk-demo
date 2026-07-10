@@ -2,7 +2,7 @@
 
 VRM アバターと AI の会話デモ。Next.js + Go + Unity WebGL + Aivis TTS。
 
-![AISTalk Image](./docs/images/image1.png)
+![AISTalk Image](./samples/images/image1.png)
 
 ## 構成
 

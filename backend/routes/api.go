@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"voice-chat-api-go/handler"
+	"voice-chat-api-go/middleware"
+	"voice-chat-api-go/quota"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -29,12 +31,17 @@ func NewRouter() http.Handler {
 	motionH := handler.NewMotionHandler()
 	eventStream := handler.NewEventStreamHandler()
 
-	r.Post("/api/chat", chatH.ChatHandler)
-	r.Post("/api/avatar/motion", motionH.PostInfer)
-	r.Route("/api/event", func(r chi.Router) {
-		r.Get("/stream/session/start", eventStream.SynthesisSessionStartHandler)
-		r.Post("/stream/session/stop", eventStream.SynthesisSessionStopHandler)
-		r.Post("/tts/aivis/synthesize", eventStream.SynthesizeAivisAudioHandler)
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.RequireFirebaseAuth)
+
+		r.With(middleware.RequireQuota(quota.KindChat)).Post("/api/chat", chatH.ChatHandler)
+		r.Post("/api/avatar/motion", motionH.PostInfer)
+
+		r.Route("/api/event", func(r chi.Router) {
+			r.Get("/stream/session/start", eventStream.SynthesisSessionStartHandler)
+			r.Post("/stream/session/stop", eventStream.SynthesisSessionStopHandler)
+			r.With(middleware.RequireQuota(quota.KindTTS)).Post("/tts/aivis/synthesize", eventStream.SynthesizeAivisAudioHandler)
+		})
 	})
 
 	return r

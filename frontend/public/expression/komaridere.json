@@ -1,0 +1,10 @@
+{
+	"situation": "困り照れ",
+	"parameters": [
+		{ "Name": "Fcl_BRW_Sorrow", "Value": 0.601 },
+		{ "Name": "Fcl_EYE_Sorrow", "Value": 0.567 },
+		{ "Name": "Fcl_EYE_Highlight_Hide", "Value": 0.533 },
+		{ "Name": "Fcl_MTH_Sorrow", "Value": 0.351 }
+	],
+	"blush": 0.8
+}

@@ -1,0 +1,48 @@
+{
+	"groups": [
+		{
+			"id": "basic",
+			"title": "基本表情",
+			"items": [
+				{ "file": "neutral.json", "label": "Neutral" },
+				{ "file": "angry.json", "label": "Angry" },
+				{ "file": "surprised.json", "label": "Surprised" },
+				{ "file": "sad.json", "label": "Sad" },
+				{ "file": "joy.json", "label": "Joy" },
+				{ "file": "happiness.json", "label": "Happiness" },
+				{ "file": "shyness.json", "label": "照れ" }
+			]
+		},
+		{
+			"id": "composite",
+			"title": "複合表情",
+			"items": [
+				{ "file": "tsundere.json", "label": "ツンデレ" },
+				{ "file": "hanikami.json", "label": "はにかみ" },
+				{ "file": "terawari.json", "label": "照れ笑い" },
+				{ "file": "komaridere.json", "label": "困り照れ" }
+			]
+		},
+		{
+			"id": "effects",
+			"title": "効果",
+			"items": [
+				{ "file": "sick_mood.json", "label": "病み" },
+				{ "file": "eyes_dark_only.json", "label": "Eyes Dark" }
+			]
+		},
+		{
+			"id": "custom",
+			"title": "カスタム",
+			"items": [
+				{ "file": "worst.json", "label": "最悪" },
+				{ "file": "sleepy.json", "label": "眠い" },
+				{ "file": "little_devil.json", "label": "小悪魔" },
+				{ "file": "bored_stare.json", "label": "ジト目" },
+				{ "file": "amae.json", "label": "甘える" },
+				{ "file": "amae2.json", "label": "甘える2" },
+				{ "file": "kiss.json", "label": "キス" }
+			]
+		}
+	]
+}

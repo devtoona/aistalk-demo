@@ -1,0 +1,10 @@
+{
+	"situation": "甘える",
+	"parameters": [
+		{ "Name": "Fcl_BRW_Joy", "Value": 0.5189999938011169 },
+		{ "Name": "Fcl_BRW_Surprised", "Value": 0.5070000290870667 },
+		{ "Name": "Fcl_EYE_Fun", "Value": 0.4390000104904175 },
+		{ "Name": "Fcl_MTH_Small", "Value": 0.3179999887943268 }
+	],
+	"blush": 0.65
+}

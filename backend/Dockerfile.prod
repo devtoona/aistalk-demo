@@ -1,0 +1,11 @@
+FROM golang:1.24.2-alpine
+
+RUN apk add --no-cache ffmpeg
+
+WORKDIR /app
+COPY . .
+RUN go build -o build-server main.go
+
+ENV PORT=8080
+EXPOSE 8080
+CMD ["./build-server"]

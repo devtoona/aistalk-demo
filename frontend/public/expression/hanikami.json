@@ -1,0 +1,9 @@
+{
+	"situation": "はにかみ",
+	"parameters": [
+		{ "Name": "Fcl_EYE_Joy_R", "Value": 1.0 },
+		{ "Name": "Fcl_EYE_Joy_L", "Value": 1.0 },
+		{ "Name": "Fcl_MTH_Fun", "Value": 0.348 }
+	],
+	"blush": 0.7
+}

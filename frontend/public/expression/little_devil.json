@@ -1,0 +1,10 @@
+{
+	"situation": "小悪魔（へぇ〜そんなことまでしちゃうんだ〜的なの）",
+	"parameters": [
+		{ "Name": "Fcl_BRW_Fun", "Value": 0.25999999046325686 },
+		{ "Name": "Fcl_EYE_Sorrow", "Value": 1.0 },
+		{ "Name": "Fcl_MTH_Angry", "Value": 0.15000000596046449 },
+		{ "Name": "Fcl_MTH_Small", "Value": 0.28999999165534975 },
+		{ "Name": "Fcl_MTH_Fun", "Value": 0.4300000071525574 }
+	]
+}

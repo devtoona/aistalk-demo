@@ -1,0 +1,112 @@
+# aistalk フロントエンドビルド
+# 1. Unity 成果物を GCS から取得 → frontend/public/unity に配置
+# 2. Next.js ビルド（静的エクスポート）
+# 3. frontend バケットにアップロード
+
+steps:
+  # Unity ビルドデータを取得（存在しない場合はスキップ）
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "fetch-unity"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        mkdir -p ./frontend/public/unity
+        # VRMChat は gs://BUCKET/latest/unity/ に index.html, Build/ 等を配置
+        # GCS にディレクトリはなく、gsutil stat はプレフィックス（パス末尾/）に使えないため、index.html の存在で判定
+        echo "[fetch-unity] Checking: gs://${_UNITY_BUILD_BUCKET}/latest/unity/"
+        if gsutil -q stat gs://${_UNITY_BUILD_BUCKET}/latest/unity/index.html 2>/dev/null; then
+          gsutil -m cp -r gs://${_UNITY_BUILD_BUCKET}/latest/unity/* ./frontend/public/unity/ || true
+          echo "[fetch-unity] Unity build copied successfully"
+        else
+          echo "Unity build not found, continuing without it"
+          echo "[fetch-unity] Listing bucket contents:"
+          gsutil ls gs://${_UNITY_BUILD_BUCKET}/ 2>/dev/null || true
+        fi
+
+  # Next.js ビルド（NEXT_PUBLIC_* はビルド時に焼き込み）
+  - name: "node:20-alpine"
+    id: "build"
+    dir: "frontend"
+    entrypoint: "sh"
+    args:
+      - "-c"
+      - |
+        npm ci
+        NEXT_PUBLIC_API_BASE_URL="${_API_BASE_URL}" \
+        NEXT_PUBLIC_STORAGE_BASE_URL="${_STORAGE_BASE_URL}" \
+        NEXT_PUBLIC_RECORDING_PERSIST_MODE="${_RECORDING_PERSIST_MODE}" \
+        NEXT_PUBLIC_APP_NAME="${_APP_NAME}" \
+        NEXT_PUBLIC_VAD_START_ON_LOAD="${_VAD_START_ON_LOAD}" \
+        NEXT_PUBLIC_VAD_REDEMPTION_MS="${_VAD_REDEMPTION_MS}" \
+        NEXT_PUBLIC_VAD_NEGATIVE_SPEECH_THRESHOLD="${_VAD_NEGATIVE_SPEECH_THRESHOLD}" \
+        NEXT_PUBLIC_VAD_POSITIVE_SPEECH_THRESHOLD="${_VAD_POSITIVE_SPEECH_THRESHOLD}" \
+        npm run build
+        # admin は Cloud Run (next start)。GCS にはプレイヤー static のみ載せる
+        rm -rf out/admin
+    waitFor: ["fetch-unity"]
+
+  # frontend バケットにアップロード
+  # uniform_bucket_level_access が有効なため ACL (-a) は使えない。IAM でアクセス制御。
+  - name: "gcr.io/cloud-builders/gsutil"
+    id: "deploy"
+    args:
+      - "-m"
+      - "cp"
+      - "-r"
+      - "./frontend/out/*"
+      - "gs://${_FRONTEND_BUCKET}/"
+    waitFor: ["build"]
+
+  # 拡張子なし HTML エイリアス（/admin 等）に Content-Type を付与
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "set-html-metadata"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        find ./frontend/out -type f ! -name '*.*' ! -path './frontend/out/_next/*' | while read -r f; do
+          rel="${f#./frontend/out/}"
+          gsutil setmeta -h "Content-Type:text/html" "gs://${_FRONTEND_BUCKET}/$rel" || true
+        done
+        echo "[set-html-metadata] Content-Type set for extensionless HTML routes"
+    waitFor: ["deploy"]
+
+  # Unity WebGL の .gz に Content-Encoding: gzip を設定（ブラウザが正しく解凍できるように）
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "set-gzip-metadata"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        for f in $(gsutil ls -r gs://${_FRONTEND_BUCKET}/unity/ 2>/dev/null | grep '\.gz$'); do
+          gsutil setmeta -h "Content-Encoding:gzip" "$f" || true
+        done
+        echo "[set-gzip-metadata] Content-Encoding set for .gz files"
+    waitFor: ["deploy"]
+
+  # GCS ウェブサイト設定（index.html, 404.html）
+  - name: "gcr.io/cloud-builders/gsutil"
+    id: "web-config"
+    args:
+      - "web"
+      - "set"
+      - "-m"
+      - "index.html"
+      - "-e"
+      - "404.html"
+      - "gs://${_FRONTEND_BUCKET}"
+    waitFor: ["deploy"]
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _API_BASE_URL: ""
+  _STORAGE_BASE_URL: ""
+  _RECORDING_PERSIST_MODE: "storage"
+  _APP_NAME: "AISTalk"
+  _VAD_START_ON_LOAD: "false"
+  _VAD_REDEMPTION_MS: "1500"
+  _VAD_NEGATIVE_SPEECH_THRESHOLD: "0.25"
+  _VAD_POSITIVE_SPEECH_THRESHOLD: "0.55"

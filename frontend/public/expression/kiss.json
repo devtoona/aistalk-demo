@@ -1,0 +1,12 @@
+{
+	"situation": "キス",
+	"parameters": [
+		{ "Name": "Fcl_BRW_Fun", "Value": 0.0820000022649765 },
+		{ "Name": "Fcl_BRW_Joy", "Value": 1.0 },
+		{ "Name": "Fcl_BRW_Surprised", "Value": 0.17399999499320985 },
+		{ "Name": "Fcl_EYE_Joy_R", "Value": 1.0 },
+		{ "Name": "Fcl_EYE_Joy_L", "Value": 1.0 },
+		{ "Name": "Fcl_MTH_Small", "Value": 0.3179999887943268 }
+	],
+	"blush": 0.75
+}

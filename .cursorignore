@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+**/secret/**
+**/*.key
+**/*.pem
+terraform.tfvars
+*.tfstate
+*.tfstate.*
+key.json

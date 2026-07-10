@@ -1,0 +1,8 @@
+{
+	"situation": "Surprised",
+	"parameters": [
+		{ "Name": "Fcl_BRW_Surprised", "Value": 0.404 },
+		{ "Name": "Fcl_EYE_Surprised", "Value": 0.556 },
+		{ "Name": "Fcl_EYE_Spread", "Value": 0.243 }
+	]
+}

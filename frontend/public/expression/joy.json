@@ -1,0 +1,7 @@
+{
+	"situation": "Joy",
+	"parameters": [
+		{ "Name": "Fcl_EYE_Joy_R", "Value": 0.25 },
+		{ "Name": "Fcl_EYE_Joy_L", "Value": 0.25 }
+	]
+}

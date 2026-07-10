@@ -1,0 +1,9 @@
+{
+	"situation": "ツンデレ",
+	"parameters": [
+		{ "Name": "Fcl_BRW_Angry", "Value": 0.732 },
+		{ "Name": "Fcl_EYE_Angry", "Value": 1.0 },
+		{ "Name": "Fcl_MTH_Angry", "Value": 0.533 }
+	],
+	"blush": 0.8
+}

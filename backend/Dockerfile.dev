@@ -1,0 +1,8 @@
+FROM golang:1.24.2-alpine
+
+RUN apk add --no-cache ffmpeg make
+
+WORKDIR /app
+COPY . .
+EXPOSE 50037
+CMD ["go", "run", "main.go"]

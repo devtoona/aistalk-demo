@@ -1,0 +1,12 @@
+{
+	"situation": "最悪",
+	"parameters": [
+		{ "Name": "Fcl_BRW_Angry", "Value": 0.5630000233650208 },
+		{ "Name": "Fcl_BRW_Fun", "Value": 0.22699999809265138 },
+		{ "Name": "Fcl_BRW_Joy", "Value": 0.1599999964237213 },
+		{ "Name": "Fcl_EYE_Sorrow", "Value": 1.0 },
+		{ "Name": "Fcl_EYE_Spread", "Value": 0.1340000033378601 },
+		{ "Name": "Fcl_EYE_Highlight_Hide", "Value": 0.5799999833106995 },
+		{ "Name": "Fcl_MTH_Angry", "Value": 0.28600001335144045 }
+	]
+}

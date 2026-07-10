@@ -1,0 +1,79 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: go-app
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    environment:
+      - PORT=${APP_PORT}
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - db
+    networks:
+      - backend
+
+  lint:
+    image: golangci/golangci-lint:v2.1.6-alpine
+    container_name: golangci-lint
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: golangci-lint run ./...
+    networks:
+      - backend
+
+  db:
+    image: postgres:16-alpine
+    container_name: ${DB_CONTAINER_NAME}
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+  migrate:
+    image: migrate/migrate:v4.16.2
+    volumes:
+      - ./database/migrations:/migrations
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend
+    # 実行例: docker compose run --rm migrate -path /migrations -database "postgres://aistalk:password@db:5432/aistalkdb?sslmode=disable" up
+
+  sqlfluff:
+    image: sqlfluff/sqlfluff
+    container_name: sqlfluff
+    working_dir: /src
+    volumes:
+      - .:/src
+    entrypoint: ["sqlfluff"]
+    networks:
+      - backend
+
+volumes:
+  db_data:
+    name: ${DB_NAME}
+
+networks:
+  backend:
+    name: ${DOCKER_NETWORK_NAME}

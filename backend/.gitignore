@@ -1,0 +1,24 @@
+.DS_Store
+# 録画マージ出力（RECORDING_PERSIST_TARGET=local-movie）
+uploads/movie/
+.env
+.env.*
+!.env.example
+.vscode
+logs/*
+# 世界解釈デバッグ（WORLD_INTERPRET_LOG_PAYLOAD）
+storage/world_interpret_requests/
+prompts/files/*
+!prompts/files/single_chat_system_base.txt
+!prompts/files/multi_chat_system_base.txt
+!prompts/files/maker_system_base.txt
+!prompts/files/format_system.txt
+!prompts/files/avatar_motion_system_base.txt
+!prompts/files/long_memory_extract_system.txt
+!prompts/files/world_interpret_system.txt
+# ビルド成果物
+build-server
+voice-chat-api-go
+**/secret/**
+**/*.key
+**/*.pem

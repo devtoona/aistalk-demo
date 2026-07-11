@@ -24,7 +24,7 @@ const (
 	aivisDefaultSynthesizePath = "/v1/tts/synthesize"
 	aivisDefaultEngineURL      = "http://127.0.0.1:10101"
 	aivisDefaultLocalSpeakerID = 888753762
-	aivisDefaultModelUUID      = "a59cb814-0083-4369-8542-f51a29e72af7"
+	aivisDefaultModelUUID      = "d0471c7d-3adc-4c99-b7b7-0e91c4d9d96f"
 )
 
 // AivisService Aivis: ローカルエンジン（VOICEVOX 互換 API）またはクラウド TTS

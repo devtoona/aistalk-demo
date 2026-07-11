@@ -5,6 +5,7 @@ import { useChatGPT } from "@/hooks/useChatGPT";
 import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
 import { useMicVolumeAnalyzer } from "@/hooks/useMicVolumeAnalyzer";
 import { useVoiceGenerate } from "@/hooks/useVoiceGenerate";
+import { CallOpenAIError } from "@/exceptions/CallOpenAIError";
 import { useTTSLoading } from "@/contexts/TTSLoadingContext";
 import { useAuthReady } from "@/contexts/AuthContext";
 import type { Message } from "@/types/Message";
@@ -88,6 +89,7 @@ function ChatPageInner() {
 	const backgroundPresetRef = useRef(backgroundPreset);
 	backgroundPresetRef.current = backgroundPreset;
 	const [errorOpen, setErrorOpen] = useState(false);
+	const [errorKind, setErrorKind] = useState<"communication" | "quota">("communication");
 	const resumeVoiceAfterTtsRef = useRef(false);
 	const motionLinesForPlaybackRef = useRef<{ motion: string; expression: string }[]>([]);
 	const mouthVolumeSmoothedRef = useRef(0);
@@ -104,11 +106,21 @@ function ChatPageInner() {
 		sendUnityMouthOpen(0);
 		sendPlayMotionToUnity("idle", true);
 		setTTSLoading(false);
+		setErrorKind("communication");
+		setErrorOpen(true);
+	};
+
+	const showQuotaExceededError = () => {
+		sendUnityMouthOpen(0);
+		sendPlayMotionToUnity("idle", true);
+		setTTSLoading(false);
+		setErrorKind("quota");
 		setErrorOpen(true);
 	};
 
 	const { generateVoice, sessionStart } = useVoiceGenerate({
 		onCommunicationError: showCommunicationError,
+		onQuotaExceeded: showQuotaExceededError,
 		onPlayChunk: (data) => {
 			const sid = data.speakerSpacePersonaId?.trim() || persona.id;
 			sendFocusSpacePersonaToUnity(sid);
@@ -320,7 +332,11 @@ function ChatPageInner() {
 			} catch (e) {
 				console.error(e);
 				setMessages(snapshot);
-				showCommunicationError();
+				if (e instanceof CallOpenAIError && e.isQuotaExceeded) {
+					showQuotaExceededError();
+				} else {
+					showCommunicationError();
+				}
 			}
 		},
 		[
@@ -541,8 +557,20 @@ function ChatPageInner() {
 				</div>
 			</div>
 
-			<Modal isOpen={errorOpen} onClose={() => setErrorOpen(false)} title="通信エラー">
-				<p className="text-gray-700">通信に失敗しました。時間を空けてもう一度お試しください。</p>
+			<Modal
+				isOpen={errorOpen}
+				onClose={() => setErrorOpen(false)}
+				title={errorKind === "quota" ? "利用上限" : "通信エラー"}
+			>
+				{errorKind === "quota" ? (
+					<p className="text-gray-700">
+						デモ版の上限に達しました。
+						<br />
+						一日置いてから遊びにきてね。
+					</p>
+				) : (
+					<p className="text-gray-700">通信に失敗しました。時間を空けてもう一度お試しください。</p>
+				)}
 			</Modal>
 		</div>
 	);

@@ -1,6 +1,6 @@
 "use client";
 
-import { CallOpenAIError } from '@/exceptions/CallOpenAIError';
+import { errorFromFailedResponse } from '@/exceptions/CallOpenAIError';
 import { useTTSLoading } from '@/contexts/TTSLoadingContext';
 import { authFetch } from '@/lib/apiClient';
 import type { FetchOpenAIResponse } from '@/types/FetchOpenAIResponse';
@@ -44,7 +44,7 @@ export function useChatGPT() {
 			});
 
 			if (!response.ok) {
-				throw new CallOpenAIError(response);
+				throw await errorFromFailedResponse(response);
 			}
 
 			const data = await response.json();

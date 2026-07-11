@@ -2,6 +2,7 @@
 
 import { CallOpenAIError } from '@/exceptions/CallOpenAIError';
 import { useTTSLoading } from '@/contexts/TTSLoadingContext';
+import { authFetch } from '@/lib/apiClient';
 import type { FetchOpenAIResponse } from '@/types/FetchOpenAIResponse';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
@@ -36,7 +37,7 @@ export function useChatGPT() {
 			if (context?.space_persona_id !== undefined) body.space_persona_id = context.space_persona_id;
 			if (context?.participants !== undefined) body.participants = context.participants;
 
-			const response = await fetch(`${API_BASE}/api/chat`, {
+			const response = await authFetch(`${API_BASE}/api/chat`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(body),

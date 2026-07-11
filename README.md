@@ -41,4 +41,4 @@ npm run dev
 ### VRM / Unity
 
 - VRM: `frontend/public/models/` に `self.vrm` / `avatar.vrm` を配置（`.gitignore` 対象）
-- Unity WebGL: `frontend/public/unity/` にビルド成果物を配置（`.gitignore` 対象）
+- Unity WebGL: `frontend/public/unity/` に配置（`.gitignore` 対象）。デプロイ時は GCS から取得（手動アップロード）

@@ -1,4 +1,4 @@
-# AISTalk backend: build → Artifact Registry → Cloud Run deploy
+# backend: build → Artifact Registry → Cloud Run deploy
 #
 # 手動実行例:
 #   gcloud builds submit --config cloudbuild-backend.yaml \

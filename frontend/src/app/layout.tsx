@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { M_PLUS_Rounded_1c, Nunito } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { TTSLoadingProvider } from "@/contexts/TTSLoadingContext";
 
 const mPlusRounded = M_PLUS_Rounded_1c({
@@ -30,7 +31,9 @@ export default function RootLayout({
   return (
     <html lang="ja" className={`${mPlusRounded.variable} ${nunito.variable}`}>
       <body className="antialiased font-rounded">
-        <TTSLoadingProvider>{children}</TTSLoadingProvider>
+        <AuthProvider>
+          <TTSLoadingProvider>{children}</TTSLoadingProvider>
+        </AuthProvider>
       </body>
     </html>
   );

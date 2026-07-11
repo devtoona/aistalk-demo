@@ -2,6 +2,7 @@
 
 import { useRef, useCallback } from "react";
 import { useTTSLoading } from "@/contexts/TTSLoadingContext";
+import { authFetch, withAccessToken } from "@/lib/apiClient";
 import type { GenerateVoiceData } from "@/types/GenerateVoiceData";
 import type { GenerateVoicePayload } from "@/types/GenerateVoicePayload";
 
@@ -191,9 +192,10 @@ export function useVoiceGenerate(options: UseVoiceGenerateOptions = {}) {
 				eventSource.current.close();
 			}
 
-			eventSource.current = new EventSource(
+			const sseUrl = await withAccessToken(
 				API_BASE + `/api/event/stream/session/start?sessionId=${sessionIdRef.current}`,
 			);
+			eventSource.current = new EventSource(sseUrl);
 			eventSource.current.onmessage = function () {};
 			eventSource.current.addEventListener("play", function (event: MessageEvent) {
 				try {
@@ -321,7 +323,7 @@ export function useVoiceGenerate(options: UseVoiceGenerateOptions = {}) {
 						segments: generateVoiceData,
 					};
 
-					const response = await fetch(`${API_BASE}/api/event/tts/aivis/synthesize`, {
+					const response = await authFetch(`${API_BASE}/api/event/tts/aivis/synthesize`, {
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify(updatedPayload),

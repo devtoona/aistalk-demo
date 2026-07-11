@@ -89,7 +89,7 @@ function ChatPageInner() {
 	const backgroundPresetRef = useRef(backgroundPreset);
 	backgroundPresetRef.current = backgroundPreset;
 	const [errorOpen, setErrorOpen] = useState(false);
-	const [errorKind, setErrorKind] = useState<"communication" | "quota">("communication");
+	const [errorKind, setErrorKind] = useState<"communication" | "quota" | "mic">("communication");
 	const resumeVoiceAfterTtsRef = useRef(false);
 	const motionLinesForPlaybackRef = useRef<{ motion: string; expression: string }[]>([]);
 	const mouthVolumeSmoothedRef = useRef(0);
@@ -141,6 +141,18 @@ function ChatPageInner() {
 	const { startRecognition, stopRecognition, isRecognizing, transcript, clearTranscript } =
 		useVoiceRecognition({
 			onSilenceCommit: (text) => handleSendRef.current?.(text),
+			onError: (reason) => {
+				if (reason === "not-allowed") {
+					setErrorKind("mic");
+					setErrorOpen(true);
+				} else if (reason === "network") {
+					console.warn(
+						"[voiceRecognition] Chrome Web Speech の network エラー。マイク権限・ネット・ブラウザを確認してください。",
+					);
+					setErrorKind("mic");
+					setErrorOpen(true);
+				}
+			},
 		});
 	const { startMicVolume, stopMicVolume, volume: micVolumeLevel } = useMicVolumeAnalyzer();
 
@@ -560,13 +572,21 @@ function ChatPageInner() {
 			<Modal
 				isOpen={errorOpen}
 				onClose={() => setErrorOpen(false)}
-				title={errorKind === "quota" ? "利用上限" : "通信エラー"}
+				title={
+					errorKind === "quota" ? "利用上限" : errorKind === "mic" ? "マイク" : "通信エラー"
+				}
 			>
 				{errorKind === "quota" ? (
 					<p className="text-gray-700">
 						デモ版の上限に達しました。
 						<br />
 						一日置いてから遊びにきてね。
+					</p>
+				) : errorKind === "mic" ? (
+					<p className="text-gray-700">
+						マイクを使えませんでした。
+						<br />
+						ブラウザのサイト設定でマイクを許可し、Chrome で再度お試しください。
 					</p>
 				) : (
 					<p className="text-gray-700">通信に失敗しました。時間を空けてもう一度お試しください。</p>

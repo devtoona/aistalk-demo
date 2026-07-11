@@ -19,12 +19,13 @@ interface SpeechRecognitionInstance {
 	lang: string;
 	onstart: (() => void) | null;
 	onresult: ((event: { results: { length: number;[i: number]: { length: number;[j: number]: { transcript: string }; isFinal: boolean } }; }) => void) | null;
-	onerror: (() => void) | null;
+	onerror: ((event: { error?: string; message?: string }) => void) | null;
 	onend: (() => void) | null;
 }
 
 export type UseVoiceRecognitionOptions = {
 	onSilenceCommit?: (text: string) => void;
+	onError?: (reason: string) => void;
 };
 
 const SILENCE_MS = 2000;
@@ -34,6 +35,8 @@ export function useVoiceRecognition(
 ): VoiceRecognitionResult {
 	const onSilenceCommitRef = useRef(options.onSilenceCommit);
 	onSilenceCommitRef.current = options.onSilenceCommit;
+	const onErrorRef = useRef(options.onError);
+	onErrorRef.current = options.onError;
 
 	const [isRecognizing, setIsRecognizing] = useState(false);
 	const [transcript, setTranscript] = useState('');
@@ -118,7 +121,13 @@ export function useVoiceRecognition(
 			}
 		};
 
-		recognition.onerror = () => {
+		recognition.onerror = (event) => {
+			const reason = event?.error || "unknown";
+			console.warn("[voiceRecognition] error:", reason, event?.message ?? "");
+			// aborted は stop() 時の想定動作
+			if (reason !== "aborted") {
+				onErrorRef.current?.(reason);
+			}
 			stopRecognition();
 		};
 

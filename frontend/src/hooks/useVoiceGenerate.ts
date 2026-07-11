@@ -12,6 +12,7 @@ export type TtsProvider = "aivis";
 
 export interface UseVoiceGenerateOptions {
 	onCommunicationError?: () => void;
+	onQuotaExceeded?: () => void;
 	/** SSE play イベント受信時に expression/motion / 話者 ID を Unity へ反映するコールバック */
 	onPlayChunk?: (data: {
 		expression?: string;
@@ -50,9 +51,11 @@ type AudioQueueItem = {
 };
 
 export function useVoiceGenerate(options: UseVoiceGenerateOptions = {}) {
-	const { onCommunicationError, onPlayChunk } = options;
+	const { onCommunicationError, onQuotaExceeded, onPlayChunk } = options;
 	const onErrorRef = useRef(onCommunicationError);
 	onErrorRef.current = onCommunicationError;
+	const onQuotaRef = useRef(onQuotaExceeded);
+	onQuotaRef.current = onQuotaExceeded;
 	const onPlayChunkRef = useRef(onPlayChunk);
 	onPlayChunkRef.current = onPlayChunk;
 
@@ -328,6 +331,11 @@ export function useVoiceGenerate(options: UseVoiceGenerateOptions = {}) {
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify(updatedPayload),
 					});
+					if (response.status === 429) {
+						onQuotaRef.current?.();
+						setTTSLoading(false);
+						return;
+					}
 					const data = await response.json();
 					if (data.status === "accepted") {
 						console.log("音声合成リクエストが成功しました");

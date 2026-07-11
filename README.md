@@ -1,6 +1,22 @@
 # AISTalk Demo (OSS)
 
-VRM アバターと AI の会話デモ。Next.js + Go + Unity WebGL + Aivis TTS。
+VRMアバターと会話できるAIチャットシステムのデモです。
+
+技術スタック：
+- Next.js
+- Go
+- Unity WebGL
+- GCP
+- Aivis TTS
+
+公開デモ：
+https://demo.aisence.jp/
+
+> [!NOTE]
+> このリポジトリをクローンしただけではデモを起動できません。
+> Unity WebGLビルド成果物は、容量およびライセンス上の理由からリポジトリには含めていません。
+> 動作確認は公開デモサイトをご利用ください。
+
 
 ![AISTalk Image](./samples/images/image1.png)
 

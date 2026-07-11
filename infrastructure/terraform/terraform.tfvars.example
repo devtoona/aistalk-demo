@@ -1,0 +1,24 @@
+# Copy to terraform.tfvars and fill in your values.
+# terraform.tfvars is gitignored.
+# セットアップ手順は ../README.md を参照。
+
+project_id         = "aistalk-demo"
+region             = "asia-northeast1"
+firestore_location = "asia-northeast1"
+connection         = "projects/YOUR_PROJECT_ID/locations/asia-northeast1/connections/YOUR_CONNECTION_NAME"
+aistalk_repository = "projects/YOUR_PROJECT_ID/locations/asia-northeast1/connections/YOUR_CONNECTION_NAME/repositories/YOUR_AISTALK_REPO_NAME"
+domain             = "demo.aisence.jp"
+app_name           = "AISTalk"
+
+# Firebase Web アプリ（既存 GCP に Firebase を追加したうえで Console で Web アプリ作成）
+# project_id と Firebase プロジェクト ID は同一（例: aistalk-demo）
+firebase_api_key = ""
+# firebase_auth_domain = "aistalk-demo.firebaseapp.com"  # 省略可
+firebase_app_id  = ""
+
+quota_daily_chat_limit = 30
+quota_daily_tts_limit  = 30
+quota_disabled         = false
+
+# 初回は false。Secret / Unity / Firebase Web 設定後に true
+enable_app = false

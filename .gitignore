@@ -18,4 +18,3 @@ uploads/
 # Production-only (kept locally, not in OSS repo)
 cloudbuild-db-migrate.yaml
 cloudbuild-admin-frontend.yaml
-infrastructure/

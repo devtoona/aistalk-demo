@@ -97,15 +97,15 @@ export const ALL_BACKGROUND_PRESETS: SelfViewBackgroundPreset[] = [
 ];
 
 export function getDefaultBackgroundPreset(): SelfViewBackgroundPreset {
-	return (
-		findBackgroundPresetById("starry-sky") ?? {
-			id: "default",
-			label: "星空",
-			kind: "gradient",
-			previewCss: "linear-gradient(180deg, #1B2A4A 0%, #060B14 100%)",
-			payload: GRADIENT_BACKGROUND_PRESETS[0]?.payload ?? DEFAULT_SELF_VIEW_BACKGROUND,
-		}
-	);
+	const daySky = findBackgroundPresetById("day-sky");
+	if (daySky) return daySky;
+	return {
+		id: "default",
+		label: "昼空",
+		kind: "gradient",
+		previewCss: "linear-gradient(180deg, #B8E4FF 0%, #FDF1EF 100%)",
+		payload: DEFAULT_SELF_VIEW_BACKGROUND,
+	};
 }
 
 export function findBackgroundPresetById(id: string): SelfViewBackgroundPreset | undefined {

@@ -46,13 +46,22 @@ export function UnityWebGLFrame({
 
   useEffect(() => {
     registerUnityIframe(iframeRef.current);
+    let readyNotified = false;
+    let pollId = 0;
+
+    const notifyReady = () => {
+      if (readyNotified) return;
+      readyNotified = true;
+      if (pollId) window.clearInterval(pollId);
+      onUnityReadyRef.current?.();
+    };
 
     const handleMessage = (event: MessageEvent) => {
       if (event.source !== iframeRef.current?.contentWindow) {
         return;
       }
       if (isUnityReadyMessage(event.data)) {
-        onUnityReadyRef.current?.();
+        notifyReady();
         return;
       }
       if (!isUnityLogMessage(event.data)) return;
@@ -67,8 +76,19 @@ export function UnityWebGLFrame({
       }
     };
 
+    // GCS 上の index.html が postMessage しない場合のフォールバック
+    pollId = window.setInterval(() => {
+      const win = iframeRef.current?.contentWindow as
+        | (Window & { unityInstance?: unknown })
+        | null;
+      if (win?.unityInstance) {
+        notifyReady();
+      }
+    }, 200);
+
     window.addEventListener("message", handleMessage);
     return () => {
+      window.clearInterval(pollId);
       window.removeEventListener("message", handleMessage);
       unregisterUnityIframe(iframeRef.current);
     };

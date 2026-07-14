@@ -383,6 +383,9 @@ function ChatPageInner() {
 				/>
 			</div>
 
+			{/* Unity 起動完了までオーバーレイ UI は出さない（iframe 内のローディングのみ） */}
+			{unityReady ? (
+			<>
 			{leftDrawerOpen || rightDrawerOpen ? (
 				<button
 					type="button"
@@ -592,6 +595,8 @@ function ChatPageInner() {
 					<p className="text-gray-700">通信に失敗しました。時間を空けてもう一度お試しください。</p>
 				)}
 			</Modal>
+			</>
+			) : null}
 		</div>
 	);
 }

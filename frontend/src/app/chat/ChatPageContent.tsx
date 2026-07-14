@@ -15,6 +15,7 @@ import { MicVolumeRing } from "@/components/MicVolumeRing";
 import { SelfViewBackgroundPalette } from "@/components/SelfViewBackgroundPalette";
 import { UnityWebGLFrame } from "@/components/UnityWebGLFrame";
 import { Modal } from "@/components/Modal";
+import { TutorialModal } from "@/components/TutorialModal";
 import {
 	buildSetMouthOpenCommandJson,
 	sendJsonToUnityReceiveController,
@@ -38,6 +39,7 @@ import {
 	loadPersonaHoverOutlineVisible,
 } from "@/lib/personaHoverOutline";
 import { resolveModelUrl } from "@/lib/resolveModelUrl";
+import { isTutorialDismissed } from "@/lib/tutorial";
 import { stringifyChatTurnContent, formatChatMessageForDisplay } from "@/utils/chatTurnContent";
 
 const DELEGATE_LINE_SEGMENTATION_TO_MOTION_AI = true;
@@ -80,6 +82,7 @@ function ChatPageInner() {
 	messagesRef.current = messages;
 	const [inputValue, setInputValue] = useState("");
 	const [unityReady, setUnityReady] = useState(false);
+	const [tutorialOpen, setTutorialOpen] = useState(false);
 	const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
 	const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
 	const [backgroundPreset, setBackgroundPreset] = useState<SelfViewBackgroundPreset>(() =>
@@ -369,6 +372,12 @@ function ChatPageInner() {
 		handleSendRef.current = handleSend;
 	}, [handleSend]);
 
+	useEffect(() => {
+		if (!unityReady) return;
+		if (isTutorialDismissed()) return;
+		setTutorialOpen(true);
+	}, [unityReady]);
+
 	return (
 		<div className="relative h-screen w-screen overflow-hidden bg-black">
 			{authError ? (
@@ -451,6 +460,36 @@ function ChatPageInner() {
 							>
 								{hoverOutlineVisible ? "ON" : "OFF"}
 							</span>
+						</button>
+					</section>
+					<section>
+						<p className="mb-2 text-xs font-semibold tracking-wide text-white/55">チュートリアル</p>
+						<button
+							type="button"
+							onClick={() => {
+								setLeftDrawerOpen(false);
+								setTutorialOpen(true);
+							}}
+							className="flex w-full items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-white/90 transition-colors hover:bg-white/10"
+						>
+							<span>チュートリアルを表示</span>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="20"
+								height="20"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								className="shrink-0 text-violet-300"
+								aria-hidden
+							>
+								<circle cx="12" cy="12" r="10" />
+								<path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+								<path d="M12 17h.01" />
+							</svg>
 						</button>
 					</section>
 				</div>
@@ -595,6 +634,8 @@ function ChatPageInner() {
 					<p className="text-gray-700">通信に失敗しました。時間を空けてもう一度お試しください。</p>
 				)}
 			</Modal>
+
+			<TutorialModal isOpen={tutorialOpen} onClose={() => setTutorialOpen(false)} />
 			</>
 			) : null}
 		</div>

@@ -14,6 +14,7 @@ import type { GenerateVoiceData } from "@/types/GenerateVoiceData";
 import { MicVolumeRing } from "@/components/MicVolumeRing";
 import { SelfViewBackgroundPalette } from "@/components/SelfViewBackgroundPalette";
 import { UnityWebGLFrame } from "@/components/UnityWebGLFrame";
+import { UnityTitleSplash } from "@/components/UnityTitleSplash";
 import { Modal } from "@/components/Modal";
 import { TutorialModal } from "@/components/TutorialModal";
 import {
@@ -82,6 +83,7 @@ function ChatPageInner() {
 	messagesRef.current = messages;
 	const [inputValue, setInputValue] = useState("");
 	const [unityReady, setUnityReady] = useState(false);
+	const [unityProgress, setUnityProgress] = useState(0);
 	const [tutorialOpen, setTutorialOpen] = useState(false);
 	const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
 	const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
@@ -388,11 +390,17 @@ function ChatPageInner() {
 			<div className="absolute inset-0 z-0">
 				<UnityWebGLFrame
 					className="h-full w-full border-0 bg-black"
-					onUnityReady={() => setUnityReady(true)}
+					onUnityProgress={setUnityProgress}
+					onUnityReady={() => {
+						setUnityProgress(1);
+						setUnityReady(true);
+					}}
 				/>
 			</div>
 
-			{/* Unity 起動完了までオーバーレイ UI は出さない（iframe 内のローディングのみ） */}
+			{!unityReady ? <UnityTitleSplash progress={unityProgress} /> : null}
+
+			{/* Unity 起動完了までチャット UI は出さない */}
 			{unityReady ? (
 			<>
 			{leftDrawerOpen || rightDrawerOpen ? (
